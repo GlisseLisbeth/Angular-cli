@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { GameService } from './game.service';
 
 @Component({
   selector: 'app-root',
@@ -7,12 +9,32 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Sintonía';
-  arrPoema = [
-    {persona:'escritor', texto: 'Sincero el paisaje'},
-    {persona:'escritor', texto: 'sin fotografías'},
-    {persona:'escritor', texto: 'sin planear el viaje'},
-    {persona:'escritor', texto: 'sin contar los días'},
-    {persona:'escritor', texto: 'sintiendo la brisa'},
-    {persona: 'escritor', texto: 'sin ninguna prisa'}
-    ]
+  arrPoema = [];
+  form: FormGroup;
+
+  constructor(private gameService: GameService,
+              private formBuilder: FormBuilder) {}
+
+  ngOnInit(): void {
+    this.form = this.formBuilder.group({
+      texto: ['', Validators.required]
+    });
+  }
+
+  addText() {
+    if (this.form.valid) {
+      const text = this.form.get('texto');
+      this.gameService.setGame(text.value).subscribe(res => {
+        this.arrPoema = null;
+        text.reset('');
+      });
+    }
+  }
+
+  showText() {
+    this.gameService.getGame().subscribe(res => {
+      this.arrPoema = res;
+    });
+  }
+
 }
